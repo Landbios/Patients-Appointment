@@ -1,11 +1,13 @@
 
 import { useForm }  from 'react-hook-form'
+import Error from './Error'
+import { DraftPatient } from '../types'
 export default function PatientForm() {
      
 
-    const {register,handleSubmit,formState: {errors}} = useForm()
-    const registerPatient = () =>{
-        console.log('registrando')
+    const {register,handleSubmit,formState: {errors}} = useForm<DraftPatient>()
+    const registerPatient = (data:DraftPatient) =>{
+        console.log(data)
 
     }
     return (
@@ -34,6 +36,7 @@ export default function PatientForm() {
                         placeholder="Patient Name" 
                         {...register('name', {required:'Patient name cant be empty'})}
                     />
+                   {errors.name && (<Error>{errors.name?.message as string}</Error>)}
                    
                 </div>
   
@@ -48,7 +51,10 @@ export default function PatientForm() {
                       placeholder="Patient Owner"
                       {...register('owner', {required:'Patient owner cant be empty'})} 
                       
+                      
                   />
+                  
+                  {errors.owner && (<Error>{errors.owner?.message as string}</Error>)}
                   
                 </div>
   
@@ -61,9 +67,17 @@ export default function PatientForm() {
                     className="w-full p-3  border border-gray-100"  
                     type="email" 
                     placeholder="Owner Email"
-                    {...register('email', {required:'Owner email cant be empty'})} 
+                    {...register("email", {
+                        required: "Owner email cant be empty",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: 'Invalid Email'
+                        }
+                      })} 
                    
                 />
+             
+                {errors.email && (<Error>{errors.email?.message as string}</Error>)}
                 
               </div>
   
@@ -78,6 +92,8 @@ export default function PatientForm() {
                       {...register('date', {required:'You need to add a Discharge Date'})}
                      
                   />
+          
+                  {errors.date && (<Error>{errors.date?.message as string}</Error>)}
                   
               </div>
               
@@ -94,6 +110,8 @@ export default function PatientForm() {
                   >
 
                   </textarea>
+                 
+                  {errors.symptoms && (<Error>{errors.symptoms?.message?.toString()}</Error>)}
                  
               </div>
   
