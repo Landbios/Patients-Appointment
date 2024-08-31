@@ -3,14 +3,61 @@ import { useForm }  from 'react-hook-form'
 import Error from './Error'
 import { DraftPatient } from '../types'
 import { usePatientStore } from '../store'
+import { useEffect } from 'react'
+import {toast} from 'react-toastify'
 export default function PatientForm() {
-    const {addPatient} = usePatientStore()
-    const {register,handleSubmit,formState: {errors},reset} = useForm<DraftPatient>()
+    const {addPatient,activeId,patients,updatePatient} = usePatientStore()
+    const {register,setValue,handleSubmit,formState: {errors},reset} = useForm<DraftPatient>()
+
     const registerPatient = (data:DraftPatient) =>{
-        addPatient(data)
-        reset()
+     
+        if(activeId){
+            toast('Patient Edited Succesfully', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                
+                });
+            
+            updatePatient(data)
+            reset()
+        }
+        else{
+            toast.success('Patient Added Succesfully', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                
+                });
+            addPatient(data)
+            reset()
+        }
+        
+        
 
     }
+
+    useEffect(() => {
+        if (activeId) {
+            const activePatient = patients.filter(patient => patient.id === activeId)[0]
+            setValue('name', activePatient.name)
+            setValue('email', activePatient.email)
+            setValue('owner', activePatient.owner)
+            setValue('date', activePatient.date)
+            setValue('symptoms', activePatient.symptoms)
+        }
+        
+    },[activeId])
     return (
 
       <div className="md:w-1/2 lg:w-2/5 mx-5">
@@ -119,7 +166,7 @@ export default function PatientForm() {
               <input
                   type="submit"
                   className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
-                  value='Guardar Paciente'
+                  value={activeId ? 'Edit Patient' : 'Save Patient'}
               />
           </form> 
       </div>
